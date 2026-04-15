@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>comorebi studio - 育成ダッシュボード</title>
+  <style>
+    :root {
+      --bg: #faf9f6;
+      --card: #ffffff;
+      --accent: #6b8f71;
+      --accent-light: #e8f0e9;
+      --text: #2c2c2c;
+      --text-light: #6e6e6e;
+      --border: #e5e2dc;
+      --shadow: 0 2px 12px rgba(0,0,0,0.06);
+      --radius: 12px;
+      --progress-bg: #e9ecef;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #6b8f71 0%, #8ab396 100%);
+      color: white;
+      padding: 40px 32px 0;
+    }
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    .header p {
+      font-size: 0.9rem;
+      opacity: 0.85;
+      margin-top: 4px;
+    }
+    .header-meta {
+      display: flex;
+      gap: 24px;
+      margin-top: 16px;
+      font-size: 0.85rem;
+      opacity: 0.9;
+      flex-wrap: wrap;
+    }
+
+    /* ── Tabs ── */
+    .tab-bar {
+      display: flex;
+      gap: 0;
+      margin-top: 24px;
+      max-width: 1100px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .tab-btn {
+      padding: 12px 28px;
+      background: rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.8);
+      border: none;
+      border-radius: 10px 10px 0 0;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .tab-btn:hover {
+      background: rgba(255,255,255,0.25);
+      color: white;
+    }
+    .tab-btn.active {
+      background: var(--bg);
+      color: var(--accent);
+    }
+    .tab-panel {
+      display: none;
+    }
+    .tab-panel.active {
+      display: block;
+    }
+
+    /* ── Main ── */
+    .main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px 60px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--accent-light);
+    }
+
+    /* ── Member Card ── */
+    .member-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px;
+      margin-bottom: 28px;
+    }
+    .member-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .member-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+    .member-role {
+      font-size: 0.8rem;
+      color: var(--text-light);
+      margin-top: 2px;
+    }
+    .member-status {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .status-ontrack { background: #d4edda; color: #155724; }
+    .status-attention { background: #fff3cd; color: #856404; }
+    .status-new { background: #d1ecf1; color: #0c5460; }
+
+    /* ── Goal ── */
+    .goal-box {
+      background: var(--accent-light);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+    }
+    .goal-box .label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+    .goal-box .value {
+      font-size: 0.95rem;
+    }
+
+    /* ── Progress ── */
+    .progress-bar-container { margin-bottom: 20px; }
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-light);
+      margin-bottom: 6px;
+    }
+    .progress-bar {
+      height: 8px;
+      background: var(--progress-bg);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #6b8f71, #8ab396);
+      border-radius: 4px;
+    }
+
+    /* ── Info Grid ── */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 640px) {
+      .info-grid { grid-template-columns: 1fr; }
+    }
+    .info-item {
+      padding: 14px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .info-item .label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-light);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .info-item ul { list-style: none; }
+    .info-item li {
+      font-size: 0.88rem;
+      padding: 3px 0 3px 16px;
+      position: relative;
+    }
+    .info-item li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 11px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+    .strengths li::before { background: #28a745; }
+    .challenges li::before { background: #ffc107; }
+    .actions li::before { background: #17a2b8; }
+    .perspective-tag {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: 4px;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+    .tag-self { background: #e8e0f0; color: #5b3d8f; }
+    .tag-trainer { background: #dce8f0; color: #2c5f7c; }
+    .tag-ai { background: #e5e5e5; color: #555; }
+
+    .full-width { grid-column: 1 / -1; }
+
+    /* ── Session Log ── */
+    .session-log {
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+    }
+    .session-log h4 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-light);
+      margin-bottom: 12px;
+    }
+    .session-entry {
+      display: flex;
+      gap: 16px;
+      padding: 12px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+    .session-entry:last-child { border-bottom: none; }
+    .session-date {
+      font-size: 0.78rem;
+      color: var(--text-light);
+      white-space: nowrap;
+      min-width: 80px;
+      padding-top: 2px;
+    }
+    .session-topic { font-weight: 600; margin-bottom: 2px; font-size: 0.88rem; }
+    .session-note { color: var(--text-light); font-size: 0.82rem; }
+
+    /* ── Curriculum Table ── */
+    .curriculum-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .curriculum-table th {
+      text-align: left;
+      padding: 10px 12px;
+      background: var(--accent-light);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .curriculum-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .curriculum-table tr:last-child td { border-bottom: none; }
+    .check-done { color: #28a745; font-weight: 700; }
+    .check-current { color: #ffc107; font-weight: 700; }
+    .check-todo { color: #ccc; }
+    .legend {
+      font-size: 0.78rem;
+      color: var(--text-light);
+      margin-top: 8px;
+    }
+
+    /* ── Growth Insight ── */
+    .growth-insight {
+      background: linear-gradient(135deg, #f8f6f0 0%, #f0ede4 100%);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .growth-insight h4 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 14px;
+      letter-spacing: 0.04em;
+    }
+    .growth-phase {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+      position: relative;
+      padding-left: 24px;
+    }
+    .growth-phase::before {
+      content: "";
+      position: absolute;
+      left: 6px;
+      top: 0;
+      bottom: -16px;
+      width: 2px;
+      background: var(--accent-light);
+    }
+    .growth-phase:last-child::before { display: none; }
+    .growth-phase .dot {
+      position: absolute;
+      left: 0;
+      top: 4px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 2px solid white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .growth-phase .phase-label {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      min-width: 60px;
+      padding-top: 2px;
+    }
+    .growth-phase .phase-content { font-size: 0.88rem; }
+    .growth-phase .phase-title { font-weight: 700; margin-bottom: 2px; }
+    .growth-phase .phase-detail { color: var(--text-light); font-size: 0.82rem; }
+    .growth-summary {
+      background: white;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-top: 16px;
+      font-size: 0.88rem;
+      border: 1px solid var(--border);
+    }
+    .growth-summary .summary-title {
+      font-weight: 700;
+      color: var(--accent);
+      font-size: 0.8rem;
+      margin-bottom: 6px;
+    }
+
+    /* ── Overview Cards ── */
+    .overview {
+      max-width: 1100px;
+      margin: 24px auto 0;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 640px) {
+      .overview { grid-template-columns: 1fr; }
+    }
+    .overview-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px 24px;
+      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.15s;
+    }
+    .overview-card:hover {
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      transform: translateY(-2px);
+    }
+    .overview-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .overview-name {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+    .overview-progress {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .overview-progress .progress-bar {
+      flex: 1;
+      height: 6px;
+    }
+    .overview-progress .progress-text {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      white-space: nowrap;
+    }
+    .overview-detail {
+      font-size: 0.8rem;
+      color: var(--text-light);
+    }
+    .overview-next {
+      font-size: 0.78rem;
+      color: var(--accent);
+      font-weight: 600;
+      margin-top: 6px;
+    }
+
+    /* ── Schedule Badge ── */
+    .schedule-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .schedule-ontrack {
+      background: #d4edda;
+      color: #155724;
+    }
+    .schedule-delayed {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .schedule-notstarted {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+
+    /* ── Next Session Box ── */
+    .next-session {
+      background: linear-gradient(135deg, #f0f7f1 0%, #e8f0e9 100%);
+      border: 1px solid var(--accent-light);
+      border-radius: 8px;
+      padding: 14px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .next-session .ns-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .next-session .ns-value {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .next-session .ns-topic {
+      font-size: 0.82rem;
+      color: var(--text-light);
+    }
+
+    .footer {
+      text-align: center;
+      padding: 32px;
+      font-size: 0.78rem;
+      color: var(--text-light);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ HEADER ══ -->
+  <div class="header">
+    <div class="header-inner">
+      <h1>comorebi studio 育成ダッシュボード</h1>
+      <p>メンバーの成長を可視化し、毎週の進捗を共有する</p>
+      <div class="header-meta">
+        <span>最終更新: 2026年4月14日（はるかちゃん第5回セッション完了）</span>
+        <span>メンバー: 2名</span>
+        <span>研修期間: 3ヶ月プログラム（全10回 / 週1回）</span>
+      </div>
+    </div>
+    <!-- ── Tab Bar ── -->
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('haruka')">はるかちゃん</button>
+      <button class="tab-btn" onclick="switchTab('uehara')">ウェラー</button>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════ -->
+  <!-- ══ TAB: はるかちゃん ══ -->
+  <!-- ══════════════════════════════════ -->
+  <div id="tab-haruka" class="tab-panel active">
+    <div class="main">
+
+      <div class="section-title">プロフィール</div>
+      <div class="member-card">
+        <div class="member-header">
+          <div>
+            <div class="member-name">はるかちゃん</div>
+            <div class="member-role">アルバイト / 週1回セッション</div>
+          </div>
+          <span class="schedule-badge schedule-delayed">予定より1回遅れ</span>
+        </div>
+
+        <div class="next-session">
+          <div>
+            <div class="ns-label">次回セッション</div>
+            <div class="ns-value">2026年4月21日（火）19:00 — 第6回</div>
+          </div>
+          <div class="ns-topic">社会領域プレゼン（文化人類学・情報経済学・経済社会学）+ 初月1ヶ月の総振り返り</div>
+        </div>
+
+        <div class="goal-box">
+          <div class="label">3ヶ月後のゴール（本人）</div>
+          <div class="value">考えることから逃げず、発言することを恐れず、自分の意思を明確に持っている状態。自分の直感やニュアンスを言語化でき、夢への解像度が高まっていること。</div>
+        </div>
+
+        <div class="progress-bar-container">
+          <div class="progress-label">
+            <span>セッション進捗</span>
+            <span>5 / 10 回完了（第6回に向けて準備中）</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 50%"></div>
+          </div>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-item strengths">
+            <div class="label">強み・ポテンシャル</div>
+            <ul>
+              <li><span class="perspective-tag tag-trainer">川原</span>観察力が高い — 相手の表情・声色・話の間から心理を読み取る力がある</li>
+              <li><span class="perspective-tag tag-trainer">川原</span>物事の本質や裏側を解き明かす力がある</li>
+              <li><span class="perspective-tag tag-trainer">川原</span>「尖った人をまとめられる」という尖った才能 — 組織で中立に立てる調整力</li>
+              <li><span class="perspective-tag tag-trainer">川原</span>チャレンジしてみようという精神がある — 恐れながらも一歩踏み出す素直さ</li>
+              <li><span class="perspective-tag tag-ai">AI分析</span>対話の中で自ら気づく力がある — 教えられるのではなく、問いかけから本質に辿り着ける</li>
+              <li><span class="perspective-tag tag-ai">AI分析</span>過去の経験と現在の学びを自分でつなげられる（部活→観察力、正太郎さんの言葉→行動指針）</li>
+              <li><span class="perspective-tag tag-ai">AI分析</span>学びを日常業務に自分で転用できる — 心理学のEASTをfarm試食コーナーに応用し、実際に試食率を上げた</li>
+              <li><span class="perspective-tag tag-trainer">川原</span>いい意味で負けず嫌い — FBを素直に受け取り、次回までにきっちり反映する実行力</li>
+            </ul>
+          </div>
+          <div class="info-item challenges">
+            <div class="label">課題・伸びしろ</div>
+            <ul>
+              <li><span class="perspective-tag tag-self">本人</span>自己理解が浅い — 感じたことを深く紐解く習慣がまだない</li>
+              <li><span class="perspective-tag tag-self">本人</span>相手にどう思われるか考えすぎる・失敗を恐れて慎重になりすぎる</li>
+              <li><span class="perspective-tag tag-self">本人</span>プライドが高く、負けると思うと本気を出さず保険をかける癖がある</li>
+              <li><span class="perspective-tag tag-self">本人</span>自分が思うクオリティで考えてしまう — 相手起点の視点がまだ弱い</li>
+              <li><span class="perspective-tag tag-ai">AI分析</span>学びを「相手に伝わる構成」に変換する力が発展途上（プレゼンが情報の羅列になりがち）</li>
+              <li><span class="perspective-tag tag-ai">AI分析</span>プレゼンのトーンが一本調子で"欲"が出ない — どこを聞いてほしいか、感情の強弱で伝える力が課題</li>
+              <li><span class="perspective-tag tag-trainer">川原</span>リサーチに時間をかけすぎる癖（1テーマ12h×3本で78h） — ゴールから逆算して必要情報を絞る力が必要</li>
+              <li><span class="perspective-tag tag-trainer">正太郎</span>仕事と私生活のバランスを自分で取る力 — 無理そうなら「3つを2つに」と交渉できるのもビジネススキル</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-item actions full-width">
+            <div class="label">次回セッションまでのアクション</div>
+            <ul>
+              <li>社会領域（文化人類学・情報経済学・経済社会学）のプレゼン準備 — 「人事の現場でアクションできる」をゴールに逆算してリサーチ。環境領域は第7回に分割。</li>
+              <li>リサーチ時間を圧縮するチャレンジ — 前回1テーマ12時間を半分目標。無理そうなら自分から相談する。</li>
+              <li>プレゼンで「欲」を意識 — どこを聞いてほしいかトーンの強弱で表現する。相手の反応を見て質問を投げる。</li>
+              <li>今日のセッションの振り返り日報を今日明日で提出。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Growth Insight ── -->
+      <div class="section-title">本質的な変化（5週間）</div>
+      <div class="growth-insight">
+
+        <div class="growth-phase">
+          <div class="dot"></div>
+          <div>
+            <div class="phase-label">Week 1（3/17）</div>
+            <div class="phase-content">
+              <div class="phase-title">「私にはない」から「私は気づいていなかった」へ</div>
+              <div class="phase-detail">強い主張ができないことをコンプレックスに感じていたが、観察力という自分にとって「当たり前」の能力が他者から見ると特別なスキルだと発見。自分を見る視点そのものが変わった最初の転換点。</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="growth-phase">
+          <div class="dot"></div>
+          <div>
+            <div class="phase-label">Week 2（3/24）</div>
+            <div class="phase-content">
+              <div class="phase-title">弱さの根っこに向き合い、コンプレックスを才能に反転させた</div>
+              <div class="phase-detail">中学時代の部活経験から「挑戦を"憧れ"で止める癖」「本気を出さず保険をかける癖」が形成されていたことを自ら言語化。同時に「中立に立てること＝尖った人をまとめられる才能」と再定義できた。過去の痛みを、前に進むための理解に変換し始めた。</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="growth-phase">
+          <div class="dot"></div>
+          <div>
+            <div class="phase-label">Week 3（3/30）</div>
+            <div class="phase-content">
+              <div class="phase-title">自分ごと化 — 会社の言葉を自分のフィルターで読めるようになった</div>
+              <div class="phase-detail">Brand PromiseやStanceを「正しく読む」のではなく「自分の現状と照らし合わせて」読めるようになった。特に「変化思考」を自分の最大課題と自己認識し、「まず踏み出す」という行動目標を自ら設定。受動的な理解から、能動的な自己適用への移行。</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="growth-phase">
+          <div class="dot"></div>
+          <div>
+            <div class="phase-label">Week 4（4/6）</div>
+            <div class="phase-content">
+              <div class="phase-title">視点が「自分」から「相手」へ広がり始めた</div>
+              <div class="phase-detail">認知心理学プレゼンで「自分が調べたこと」の羅列になっていたことに気づき、「誰に向けて・何のために」という相手起点の視点を獲得。「クオリティは相手が決める」という発見はクライアントワークの核心。さらにAI活用を自発的に提案するなど、"言われたことをやる"から"自分で考えて動く"への移行が見え始めている。</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="growth-phase">
+          <div class="dot"></div>
+          <div>
+            <div class="phase-label">Week 5（4/14）</div>
+            <div class="phase-content">
+              <div class="phase-title">学びを現場に還す循環が動き出した</div>
+              <div class="phase-detail">学んだEAST（簡単にする）の概念を自分でfarm試食コーナーに応用し、試食率の向上を実感 → なぜそうなるかを心理学で言語化。週1の学びが日常業務に転用される循環が初めて立ち上がった。プレゼン自体もFBを素直に反映して構造面は大幅に改善（6/10自己評価）。一方で、内容理解が浅い → 読み上げ感・一本調子という新しい課題が顕在化。「情報を集める」から「自分のものにして届ける」段階へのシフトが次のテーマ。</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="growth-summary">
+          <div class="summary-title">総合所見</div>
+          4週間で起きている最も大きな変化は<strong>「自己認知のOS」が書き変わり始めていること</strong>。<br>
+          「できない人間」→「やってこなかっただけ」→「やり方を知れば動ける」と、自分への認識が根本から変わりつつある。<br><br>
+          特筆すべきは、この変化が外から教えられたものではなく、対話の中で<strong>本人が自ら気づいている</strong>点。これは定着しやすい学びであり、今後クライアントワークにおいても「相手の中にある答えを引き出す」ブランディングの姿勢と一致する。<br><br>
+          <strong>次のフェーズで注目したいこと：</strong>①学びを「自分のもの」として語れるレベルまで理解を深めて、一本調子から"欲"のある伝達へ進化できるか。②ゴールから逆算してリサーチを絞り込み、78h → 半分に圧縮できるか。③farm試食の成功体験のように、学びを日常業務に転用する循環を継続できるか。
+        </div>
+      </div>
+
+      <!-- ── Session Log ── -->
+      <div class="section-title">セッション履歴</div>
+      <div class="member-card">
+        <div class="session-entry">
+          <div class="session-date">2026/04/14</div>
+          <div class="session-content">
+            <div class="session-topic">第5回 人間領域プレゼン（認知心理学・行動経済学・社会心理学）</div>
+            <div class="session-note">3テーマ全てプレゼン実施。構成面（冒頭で流れ・所要時間を提示、質問から入って注意を引く、メリットを先に伝える、言葉を噛み砕く）は前回FBを素直に反映し大幅改善。自己評価6/10。冒頭シェアでfarm試食コーナーにEASTを応用し試食率を上げた事例を自ら報告 — 学びを現場に還す循環が動き出した。新たな課題：①トーンが一本調子で"欲"が出ない（読み上げ感の原因は内容理解の浅さ / 正太郎）②ビジネス具体例の選定意図を言葉にする（育休を選んだ理由を明言する）③リサーチに1テーマ12h×3本=78hは多すぎる → ゴール逆算で圧縮する。正太郎より「まっちゃんとの関係を優先、無理なら自分から交渉する力もビジネススキル」との重要FB。</div>
+          </div>
+        </div>
+        <div class="session-entry">
+          <div class="session-date">2026/04/06</div>
+          <div class="session-content">
+            <div class="session-topic">行動指針④〜⑦読み解き完了 + 認知心理学プレゼン（初回）</div>
+            <div class="session-note">行動指針の読み解きを全て完了。⑥クオリティ追求で「クオリティの基準は自分ではなくお客様が決める」ことに気づく重要な学び。認知心理学プレゼンでは、情報の羅列になっていた点をFBし、ターゲット設定→構成→作り込みの順序を確認。AI活用（ChatGPTで日々の振り返り・接客分析）を自発的に提案。</div>
+          </div>
+        </div>
+        <div class="session-entry">
+          <div class="session-date">2026/03/30</div>
+          <div class="session-content">
+            <div class="session-topic">Brand Promise + 行動指針（①本質探究 ②入念なリサーチ ③変化思考）読み解き</div>
+            <div class="session-note">全ての文章の芯がブレていないことに自ら気づく。信用（過去の実績・論理的）と信頼（未来への期待・感情的）を定義。行動指針③「変化思考」が自分の最大の課題と認識。「まず踏み出してみる」を今年の目標に設定。プレッシャーではなく、憧れの自分を想像して前向きに行動する姿勢へ転換。</div>
+          </div>
+        </div>
+        <div class="session-entry">
+          <div class="session-date">2026/03/24</div>
+          <div class="session-content">
+            <div class="session-topic">自己理解の深化 + Brand Mission読み解き</div>
+            <div class="session-note">「尖った人をまとめられる」という才能を発見。長年コンプレックスだった「中立でいること」が実は強みだと気づく。弱さの原因を言語化し、感情に落とし込めた。Brand Missionの読み合わせでは、イベント接客が「comorebi farmらしさ」ではなく「イベントらしさ」だったことに自ら気づく。</div>
+          </div>
+        </div>
+        <div class="session-entry">
+          <div class="session-date">2026/03/17</div>
+          <div class="session-content">
+            <div class="session-topic">初回研修 — 自己理解と特性の発見</div>
+            <div class="session-note">観察力という強みを発見。「苦手」と思っていたことが実は「やってこなかっただけ」と気づく転換点に。自分の感情を言語化する重要性を認識。正太郎さん・えみさんのクライアントワークから学びたいという意欲あり。</div>
+          </div>
+        </div>
+        <div class="session-entry">
+          <div class="session-date">3/24〜4/6</div>
+          <div class="session-content">
+            <div class="session-topic">ブランドミッション・バリュー・スタンス読み合わせ（完了）</div>
+            <div class="session-note">代表と作成した原稿を一文ずつ読み合わせ。言葉の意味を対話しながら理解を深めた。第2〜4回セッションにまたがって実施。</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Curriculum (Haruka) ── -->
+      <div class="section-title">カリキュラム進捗</div>
+      <div class="member-card">
+        <table class="curriculum-table">
+          <thead>
+            <tr>
+              <th>月</th>
+              <th>領域</th>
+              <th>テーマ</th>
+              <th>本質</th>
+              <th style="text-align:center">予定</th>
+              <th style="text-align:center">状態</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td rowspan="2">1ヶ月目</td>
+              <td>自己</td>
+              <td>コーチングセッション</td>
+              <td>自分自身の強みを発見し、挑戦したいゴールを明確にする</td>
+              <td style="text-align:center">第1回</td>
+              <td style="text-align:center" class="check-done">&#10003;</td>
+            </tr>
+            <tr>
+              <td>自社</td>
+              <td>理念</td>
+              <td>comorebi studioのらしさを理解する</td>
+              <td style="text-align:center">第2〜4回</td>
+              <td style="text-align:center" class="check-done">&#10003;</td>
+            </tr>
+            <tr>
+              <td rowspan="9">2ヶ月目</td>
+              <td rowspan="3">人間</td>
+              <td>認知心理学</td>
+              <td>人の情報の受け取り方・記憶の構造を知る</td>
+              <td style="text-align:center" rowspan="3">第5回</td>
+              <td style="text-align:center" class="check-done">&#10003;</td>
+            </tr>
+            <tr>
+              <td>行動経済学</td>
+              <td>感情や思い込みによる不合理な行動を理解する</td>
+              <td style="text-align:center" class="check-done">&#10003;</td>
+            </tr>
+            <tr>
+              <td>社会心理学</td>
+              <td>一人のときと集団の中での行動の変化を知る</td>
+              <td style="text-align:center" class="check-done">&#10003;</td>
+            </tr>
+            <tr>
+              <td rowspan="3">社会</td>
+              <td>文化人類学</td>
+              <td>「当たり前」とされる価値観の背景を読み解く</td>
+              <td style="text-align:center" rowspan="3">第6回</td>
+              <td style="text-align:center" class="check-current">&#9679;</td>
+            </tr>
+            <tr>
+              <td>情報経済学</td>
+              <td>情報の量や偏りが人の選択をどう左右するか</td>
+              <td style="text-align:center" class="check-current">&#9679;</td>
+            </tr>
+            <tr>
+              <td>経済社会学</td>
+              <td>経済は信頼や人間関係のネットワークで動く</td>
+              <td style="text-align:center" class="check-current">&#9679;</td>
+            </tr>
+            <tr>
+              <td rowspan="3">環境</td>
+              <td>地政学</td>
+              <td>地理や資源が力関係にどう影響するか</td>
+              <td style="text-align:center" rowspan="3">第7回</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td>生態学</td>
+              <td>自然はどんな循環とバランスで成り立つか</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td>環境社会学</td>
+              <td>社会の発展と自然環境の相互影響</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td rowspan="9">3ヶ月目</td>
+              <td rowspan="3">意思決定</td>
+              <td>プレゼン</td>
+              <td>相手の意思決定コストを下げ行動スイッチを押す</td>
+              <td style="text-align:center" rowspan="3">第8回</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td>ファシリテーション</td>
+              <td>複数人の知恵を掛け合わせ合意形成を導く</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td>ネゴシエーション</td>
+              <td>双方が納得できる「第3の案」を共創する</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td rowspan="3">組織</td>
+              <td>オペレーション</td>
+              <td>再現性のある仕組みを作ること</td>
+              <td style="text-align:center" rowspan="3">第9回</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td>プロジェクトマネジメント</td>
+              <td>期限と資源を最適配分して確実に終わらせる</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td>チームビルディング</td>
+              <td>強みを掛け合わせ、パフォーマンスを最大化する</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td rowspan="3">戦略</td>
+              <td>CX設計</td>
+              <td>ブランドの約束を全接点で証明し続ける</td>
+              <td style="text-align:center" rowspan="3">第10回</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td>マーケティング</td>
+              <td>自社の価値が自然と選ばれる状態を作ること</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td>経営企画</td>
+              <td>資源と収支を俯瞰し進むべき方向を決定する</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="legend">
+          <span class="check-done">&#10003;</span> 完了 &nbsp;
+          <span class="check-current">&#9679;</span> 進行中 &nbsp;
+          <span class="check-todo">&#x2015;</span> 未着手
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- ══ TAB: ウェラー ══ -->
+  <!-- ══════════════════════════════════ -->
+  <div id="tab-uehara" class="tab-panel">
+    <div class="main">
+
+      <div class="section-title">プロフィール</div>
+      <div class="member-card">
+        <div class="member-header">
+          <div>
+            <div class="member-name">ウェラー</div>
+            <div class="member-role">ブランドマネージャー / 2026年4月10日〜</div>
+          </div>
+          <span class="member-status status-ontrack">進行中</span>
+        </div>
+
+        <div class="next-session">
+          <div>
+            <div class="ns-label">次回セッション</div>
+            <div class="ns-value">2026年4月18日（土）15:00 — 第2回</div>
+          </div>
+          <div class="ns-topic">comorebi studioが大事にしている価値観の読み合わせ</div>
+        </div>
+
+        <div class="goal-box">
+          <div class="label">3ヶ月後のゴール（本人 + 川原）</div>
+          <div class="value">「言わんでええかも」をゼロにする。自分の機能（コンテキストの再現・新たな視点の創出）を理解し、「これはできる」「これは人に頼る」を自分で判断できる状態。機能を活かして仕事をする感覚を取り戻し、本来の探索的なエネルギーで動けていること。</div>
+        </div>
+
+        <div class="progress-bar-container">
+          <div class="progress-label">
+            <span>セッション進捗</span>
+            <span>1 / 10 回完了（第2回に向けて準備中）</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 10%"></div>
+          </div>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-item strengths">
+            <div class="label">強み・ポテンシャル</div>
+            <ul>
+              <li><span class="perspective-tag tag-trainer">川原</span>コンテキストの再現力 — 人・場・状況の非言語な空気を写真編集や対人関係で再現しようとする</li>
+              <li><span class="perspective-tag tag-trainer">川原</span>新たな視点を生み出す力 — 相手が持っていない見方を提供する（結婚式の見えないシーン、グループ内の視点転換）</li>
+              <li><span class="perspective-tag tag-trainer">川原</span>探索・開拓のエネルギー — 幼少期から「みんなと違う道」を自ら選ぶ（島外の中学、石川県の高校、農業への挑戦）</li>
+              <li><span class="perspective-tag tag-ai">AI分析</span>没頭力がある — 写真編集では朝方まで止められないほどの集中力。機能と合致した作業では持続力を発揮する</li>
+              <li><span class="perspective-tag tag-ai">AI分析</span>人への感受性が高い — グループで楽しくなさそうな人に自然と目が行き、声をかけずにいられない</li>
+            </ul>
+          </div>
+          <div class="info-item challenges">
+            <div class="label">課題・伸びしろ</div>
+            <ul>
+              <li><span class="perspective-tag tag-self">本人</span>「嫌われたくない」恐怖 — 思ったことを言わず溜める癖がある（母子家庭の幼少体験が根っこ）</li>
+              <li><span class="perspective-tag tag-self">本人</span>成功体験の不足 — 大学卒業後に大きな成果がなく、自己評価が3〜4/10まで低下</li>
+              <li><span class="perspective-tag tag-self">本人</span>最初は燃えるが継続できない — 新しいことへの着火力はあるが、持続できないパターン</li>
+              <li><span class="perspective-tag tag-trainer">川原</span>機能を活かしていないから飽きる — 継続できないのは意志の問題ではなく、強みと活動のミスマッチ</li>
+              <li><span class="perspective-tag tag-trainer">川原</span>人を信頼できていない — 「嫌われるかも」は究極的には周囲への信頼不足の問題</li>
+              <li><span class="perspective-tag tag-ai">AI分析</span>言語化力が発展途上 — 感覚的に捉えていることを言葉にする経験が少なく、対話中に何度も詰まる</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-item actions full-width">
+            <div class="label">次回セッションまでのアクション</div>
+            <ul>
+              <li>振り返り日報を提出 — 今日のセッションで感じたこと・気づき・課題・自分の素敵なところを自分の言葉で（生成AI不使用）。Googleドキュメントで提出。</li>
+              <li>comorebi studioのドキュメントを読む — 「言葉のセンサーを研ぎ澄ます」観点で。各単語・文章の意味を自分なりに考えておく。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Growth Insight (Uehara) ── -->
+      <div class="section-title">本質的な変化</div>
+      <div class="growth-insight">
+
+        <div class="growth-phase">
+          <div class="dot"></div>
+          <div>
+            <div class="phase-label">Week 1（4/10）</div>
+            <div class="phase-content">
+              <div class="phase-title">「自分の機能」を初めて言語化できた</div>
+              <div class="phase-detail">幼少期の獣道探索、写真編集への没頭、グループ内の視点提供。バラバラに見えていた自分の行動パターンが「コンテキストの再現」「新たな視点の創出」という一つの機能として言語化された。本人も「初めて言語化できた気がする」と発言。同時に、「言わんでええかも」で自分を抑圧してきた構造にも気づき、「本来の自分を取り戻したい」という明確な意志が生まれた。</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="growth-summary">
+          <div class="summary-title">総合所見</div>
+          初回セッションとしては非常に深いところまで到達した。ウェラーの機能は<strong>「人・場・状況のコンテキストを再現する」「新たな視点を生み出す」</strong>こと。これは写真編集・デザイン・対人関係すべてに一貫して現れている。<br><br>
+          最大の課題は<strong>恐怖による自己抑圧</strong>。母子家庭での幼少体験から「嫌われたくない」恐怖が形成され、本来持っている探索的・開拓的なエネルギーが封じられている。「和を乱さない」ことに精一杯な現在の自分と、中学で島を飛び出し石川県まで行った本来の自分のギャップを本人が認識できたことが、この先の変化の起点になる。<br><br>
+          <strong>次のフェーズで注目したいこと：</strong>comorebi studioの価値観読み合わせで「言葉のセンサー」がどこまで機能するか。また、日報で自分の感覚をどこまで言語化できるか。言語化力の伸びがこの先の変化スピードを左右する。
+        </div>
+      </div>
+
+      <!-- ── Session Log (Uehara) ── -->
+      <div class="section-title">セッション履歴</div>
+      <div class="member-card">
+        <div class="session-entry">
+          <div class="session-date">2026/04/10</div>
+          <div class="session-content">
+            <div class="session-topic">第1回 コーチングセッション — 自己理解と機能の発見</div>
+            <div class="session-note">幼少期〜現在までの人生を振り返り、ウェラーの「機能」を特定。写真編集での没頭、獣道探索、進路選択のエピソードから「コンテキストの再現」「新たな視点の創出」が一貫した強みだと言語化。「嫌われたくない」恐怖による自己抑圧が最大の課題。3ヶ月ゴール:「言わんでええかも」をゼロにし、機能を活かして動ける自分を取り戻す。</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Curriculum (Uehara) ── -->
+      <div class="section-title">カリキュラム進捗</div>
+      <div class="member-card">
+        <table class="curriculum-table">
+          <thead>
+            <tr>
+              <th>月</th>
+              <th>領域</th>
+              <th>テーマ</th>
+              <th>本質</th>
+              <th style="text-align:center">予定</th>
+              <th style="text-align:center">状態</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td rowspan="2">1ヶ月目</td>
+              <td>自己</td>
+              <td>コーチングセッション</td>
+              <td>自分自身の強みを発見し、挑戦したいゴールを明確にする</td>
+              <td style="text-align:center">第1回</td>
+              <td style="text-align:center" class="check-done">&#10003;</td>
+            </tr>
+            <tr>
+              <td>自社</td>
+              <td>理念</td>
+              <td>comorebi studioのらしさを理解する</td>
+              <td style="text-align:center">第2〜4回</td>
+              <td style="text-align:center" class="check-current">&#9679;</td>
+            </tr>
+            <tr>
+              <td rowspan="9">2ヶ月目</td>
+              <td rowspan="3">人間</td>
+              <td>認知心理学</td>
+              <td>人の情報の受け取り方・記憶の構造を知る</td>
+              <td style="text-align:center" rowspan="3">第5回</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td>行動経済学</td>
+              <td>感情や思い込みによる不合理な行動を理解する</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td>社会心理学</td>
+              <td>一人のときと集団の中での行動の変化を知る</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td rowspan="3">社会</td>
+              <td>文化人類学</td>
+              <td>「当たり前」とされる価値観の背景を読み解く</td>
+              <td style="text-align:center" rowspan="3">第6回</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td>情報経済学</td>
+              <td>情報の量や偏りが人の選択をどう左右するか</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td>経済社会学</td>
+              <td>経済は信頼や人間関係のネットワークで動く</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td rowspan="3">環境</td>
+              <td>地政学</td>
+              <td>地理や資源が力関係にどう影響するか</td>
+              <td style="text-align:center" rowspan="3">第7回</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td>生態学</td>
+              <td>自然はどんな循環とバランスで成り立つか</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td>環境社会学</td>
+              <td>社会の発展と自然環境の相互影響</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td rowspan="9">3ヶ月目</td>
+              <td rowspan="3">意思決定</td>
+              <td>プレゼン</td>
+              <td>相手の意思決定コストを下げ行動スイッチを押す</td>
+              <td style="text-align:center" rowspan="3">第8回</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td>ファシリテーション</td>
+              <td>複数人の知恵を掛け合わせ合意形成を導く</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td>ネゴシエーション</td>
+              <td>双方が納得できる「第3の案」を共創する</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td rowspan="3">組織</td>
+              <td>オペレーション</td>
+              <td>再現性のある仕組みを作ること</td>
+              <td style="text-align:center" rowspan="3">第9回</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td>プロジェクトマネジメント</td>
+              <td>期限と資源を最適配分して確実に終わらせる</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td>チームビルディング</td>
+              <td>強みを掛け合わせ、パフォーマンスを最大化する</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td rowspan="3">戦略</td>
+              <td>CX設計</td>
+              <td>ブランドの約束を全接点で証明し続ける</td>
+              <td style="text-align:center" rowspan="3">第10回</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td>マーケティング</td>
+              <td>自社の価値が自然と選ばれる状態を作ること</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+            <tr>
+              <td>経営企画</td>
+              <td>資源と収支を俯瞰し進むべき方向を決定する</td>
+              <td style="text-align:center" class="check-todo">&#x2015;</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="legend">
+          <span class="check-done">&#10003;</span> 完了 &nbsp;
+          <span class="check-current">&#9679;</span> 進行中 &nbsp;
+          <span class="check-todo">&#x2015;</span> 未着手
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer">
+    comorebi studio 育成ダッシュボード &copy; 2026
+  </div>
+
+  <script>
+    function switchTab(name) {
+      document.querySelectorAll('.tab-panel').forEach(function(p) {
+        p.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-btn').forEach(function(b) {
+        b.classList.remove('active');
+      });
+      document.getElementById('tab-' + name).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+    function switchTabByName(name) {
+      document.querySelectorAll('.tab-panel').forEach(function(p) {
+        p.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-btn').forEach(function(b) {
+        b.classList.remove('active');
+      });
+      document.getElementById('tab-' + name).classList.add('active');
+      var buttons = document.querySelectorAll('.tab-btn');
+      var idx = name === 'haruka' ? 0 : 1;
+      buttons[idx].classList.add('active');
+      document.getElementById('tab-' + name).scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  </script>
+
+</body>
+</html>
